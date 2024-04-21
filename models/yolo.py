@@ -447,7 +447,7 @@ def parse_model(d, ch):
         layers.append(m_)
         if i == 0:
             ch = []
-        ch.append(c2)
+        ch.append(c2)  # 每一层的输出维度会加入到ch这个list中，方便下一层的输入维度的获取
     return nn.Sequential(*layers), sorted(save)
 
 
