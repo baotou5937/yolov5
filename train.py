@@ -215,8 +215,10 @@ def train(hyp, opt, device, callbacks):
         loggers.on_params_update({"batch_size": batch_size})
 
     # Optimizer
+    # nominal bs，大白话就是只能支撑bs16的gpu，却想要bs64的效果
     nbs = 64  # nominal batch size
     accumulate = max(round(nbs / batch_size), 1)  # accumulate loss before optimizing
+    # 权重衰减，代码是设置以bs64为单位，如果是bs128，那么衰减速度会加快一倍
     hyp["weight_decay"] *= batch_size * accumulate / nbs  # scale weight_decay
     optimizer = smart_optimizer(model, opt.optimizer, hyp["lr0"], hyp["momentum"], hyp["weight_decay"])
 
@@ -623,6 +625,7 @@ def main(opt, callbacks=Callbacks()):
         train(opt.hyp, opt, device, callbacks)
 
     # Evolve hyperparameters (optional)
+    # 根据遗传算法突变进行测试，进化出最优超参数（耗时、耗资源）
     else:
         # Hyperparameter evolution metadata (including this hyperparameter True-False, lower_limit, upper_limit)
         meta = {
